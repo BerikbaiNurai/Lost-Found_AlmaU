@@ -36,9 +36,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or "anon"
 
+    new_user = False
     if user_id not in data["users"]:
         data["users"][user_id] = username
         save_data()
+        new_user = True
 
     count = len(data["users"])
 
@@ -46,8 +48,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ["🟢 Найдено", "🔴 Потеряно"],
                 ["🗂 Мои посты"]]
 
+    message = (
+        f"Привет! Ты {count}-й пользователь по счёту.\nВыберите действие:"
+        if new_user else "Добро пожаловать обратно! Вы уже зарегистрированы.\nВыберите действие:"
+    )
+
     await update.message.reply_text(
-        f"Добро пожаловать! Сейчас в системе {count} пользователь(а/ей).\nВыберите действие:",
+        message,
         reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     )
     return CHOOSING
@@ -106,7 +113,7 @@ async def choose_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await show_found_items(update, context)
     elif msg == "🔴 Потеряно":
         return await show_lost_items(update, context)
-    elif msg == "💂 Мои посты":
+    elif msg == "🗂 Мои посты":
         return await show_my_posts(update, context)
     else:
         await update.message.reply_text("Выберите действие с клавиатуры.")
@@ -115,7 +122,7 @@ async def choose_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-    control_buttons = ["🟢 Нашёл", "🔴 Потерял", "🟢 Найдено", "🔴 Потеряно", "💂 Мои посты"]
+    control_buttons = ["🟢 Нашёл", "🔴 Потерял", "🟢 Найдено", "🔴 Потеряно", "🗂 Мои посты"]
 
     if text in control_buttons:
         return await choose_action(update, context)
@@ -229,7 +236,6 @@ async def delete_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_posts:
         data["items"].remove(user_posts[0])
         save_data()
-
         try:
             await query.message.delete()
         except Exception as e:
@@ -264,12 +270,13 @@ def main():
             ASK_PHOTO: [MessageHandler(filters.TEXT, ask_for_photo)],
             SENDING_PHOTO: [MessageHandler(filters.PHOTO, get_photo)],
         },
-        fallbacks=[],
+        fallbacks=[CommandHandler("start", start)],
     )
 
     app.add_handler(conv_handler)
     app.add_handler(CallbackQueryHandler(delete_post, pattern="delete:"))
     app.add_handler(CommandHandler("users", list_users))
+    app.add_handler(CommandHandler("start", start))
 
     app.run_polling()
 
