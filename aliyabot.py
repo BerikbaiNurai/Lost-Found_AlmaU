@@ -157,6 +157,7 @@ async def save_item_without_photo(update: Update, context: ContextTypes.DEFAULT_
         "description": context.user_data["description"],
         "photo_file_id": None
     }
+    print(f"[DEBUG] Сохраняем без фото: {item}")
     data["items"].append(item)
     save_data()
     await update.message.reply_text("✅ Объявление без фото добавлено!")
@@ -173,6 +174,7 @@ async def get_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "description": context.user_data["description"],
         "photo_file_id": photo_file_id
     }
+    print(f"[DEBUG] Сохраняем с фото: {item}")
     data["items"].append(item)
     save_data()
     await update.message.reply_text("✅ Объявление с фото добавлено!")
@@ -194,7 +196,9 @@ async def show_found_items(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def show_lost_items(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print(f"[DEBUG] Все записи: {data['items']}")
     lost_items = [item for item in data["items"] if item["type"] == "lost"]
+    print(f"[DEBUG] Потерянные вещи: {lost_items}") 
     if not lost_items:
         await update.message.reply_text("❌ Потерянных вещей пока нет.")
         return CHOOSING
