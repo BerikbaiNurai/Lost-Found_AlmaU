@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 
 CHOOSING, TYPING_DESC, ASK_PHOTO, SENDING_PHOTO = range(4)
 
-DATA_FILE = "data.json"
+DATA_FILE = "/mnt/data/data.json"
 
 
 if exists(DATA_FILE):
