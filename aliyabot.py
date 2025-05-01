@@ -53,7 +53,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return CHOOSING
 
 
-
 async def send_template(update: Update, context: ContextTypes.DEFAULT_TYPE, mode: str = ""):
     if mode == "found":
         template = (
