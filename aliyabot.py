@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 
 CHOOSING, TYPING_DESC, ASK_PHOTO, SENDING_PHOTO = range(4)
 
-DATA_FILE = "/data/data.json"
+DATA_FILE = "data.json"
 
 if exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
@@ -36,18 +36,25 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or "anon"
 
+    new_user = False
     if user_id not in data["users"]:
         data["users"][user_id] = username
         save_data()
+        new_user = True
 
     count = len(data["users"])
 
     keyboard = [["🟢 Нашёл", "🔴 Потерял"],
                 ["🟢 Найдено", "🔴 Потеряно"],
-                ["🗂 Мои посты"]]
+                ["💂 Мои посты"]]
+
+    message = (
+        f"Привет! Ты {count}-й пользователь по счёту.\nВыберите действие:"
+        if new_user else "С возвращением! Выберите действие:"
+    )
 
     await update.message.reply_text(
-        f"Привет! Ты {count}-й пользователь по счёту.\nВыберите действие:",
+        message,
         reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     )
     return CHOOSING
@@ -106,7 +113,7 @@ async def choose_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await show_found_items(update, context)
     elif msg == "🔴 Потеряно":
         return await show_lost_items(update, context)
-    elif msg == "🗂 Мои посты":
+    elif msg == "💂 Мои посты":
         return await show_my_posts(update, context)
     else:
         await update.message.reply_text("Выберите действие с клавиатуры.")
@@ -115,7 +122,7 @@ async def choose_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
-    control_buttons = ["🟢 Нашёл", "🔴 Потерял", "🟢 Найдено", "🔴 Потеряно", "🗂 Мои посты"]
+    control_buttons = ["🟢 Нашёл", "🔴 Потерял", "🟢 Найдено", "🔴 Потеряно", "💂 Мои посты"]
 
     if text in control_buttons:
         return await choose_action(update, context)
@@ -240,7 +247,6 @@ async def delete_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 
-# 👥 Команда /users для просмотра всех пользователей
 async def list_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if str(update.message.from_user.id) != str(ADMIN_ID):
         await update.message.reply_text("❌ У вас нет доступа к этому разделу.")
