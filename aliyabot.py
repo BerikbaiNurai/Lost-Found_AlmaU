@@ -9,7 +9,7 @@ from telegram.ext import (
 )
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-ADMIN_ID = "1218916376"
+ADMIN_ID = "1218916376"  # замените на ваш Telegram ID
 
 logging.basicConfig(level=logging.INFO)
 
@@ -260,7 +260,7 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            CHOOSING: [MessageHandler(filters.TEXT, choose_action)],
+            CHOOSING: [MessageHandler(filters.TEXT & (~filters.COMMAND), choose_action)],
             TYPING_DESC: [MessageHandler(filters.TEXT, get_description)],
             ASK_PHOTO: [MessageHandler(filters.TEXT, ask_for_photo)],
             SENDING_PHOTO: [MessageHandler(filters.PHOTO, get_photo)],
