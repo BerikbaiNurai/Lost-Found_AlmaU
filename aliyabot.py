@@ -9,7 +9,7 @@ from telegram.ext import (
 )
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-ADMIN_ID = "1218916376"  # замените на ваш Telegram ID
+ADMIN_ID = "1218916376"
 
 logging.basicConfig(level=logging.INFO)
 
@@ -36,25 +36,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.message.from_user.id)
     username = update.message.from_user.username or "anon"
 
-    new_user = False
     if user_id not in data["users"]:
         data["users"][user_id] = username
         save_data()
-        new_user = True
 
     count = len(data["users"])
 
     keyboard = [["🟢 Нашёл", "🔴 Потерял"],
                 ["🟢 Найдено", "🔴 Потеряно"],
-                ["💂 Мои посты"]]
-
-    message = (
-        f"Привет! Ты {count}-й пользователь по счёту.\nВыберите действие:"
-        if new_user else "С возвращением! Выберите действие:"
-    )
+                ["🗂 Мои посты"]]
 
     await update.message.reply_text(
-        message,
+        f"Добро пожаловать! Сейчас в системе {count} пользователь(а/ей).\nВыберите действие:",
         reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     )
     return CHOOSING
