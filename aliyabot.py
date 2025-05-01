@@ -40,14 +40,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data["users"][user_id] = username
         save_data()
 
-    user_number = list(data["users"]).index(user_id) + 1
+    count = len(data["users"])
 
     keyboard = [["🟢 Нашёл", "🔴 Потерял"],
                 ["🟢 Найдено", "🔴 Потеряно"],
                 ["🗂 Мои посты"]]
 
     await update.message.reply_text(
-        f"Привет! Ты {user_number}-й пользователь по счёту.\nВыберите действие:",
+        f"Привет! Ты {count}-й пользователь по счёту.\nВыберите действие:",
         reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     )
     return CHOOSING
