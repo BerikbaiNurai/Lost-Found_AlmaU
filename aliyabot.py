@@ -181,7 +181,7 @@ async def show_found_items(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not found_items:
         await update.message.reply_text("❌ Найденных вещей пока нет.")
         return CHOOSING
-    for item in found_items[:5]:
+    for item in found_items:
         caption = f"🟢 *Найдено*\n\n*Описание:* {item['description']}\n*Контакт:* @{item['username']}"
         if item["photo_file_id"]:
             await update.message.reply_photo(item["photo_file_id"], caption=caption, parse_mode="Markdown")
@@ -195,7 +195,7 @@ async def show_lost_items(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not lost_items:
         await update.message.reply_text("❌ Потерянных вещей пока нет.")
         return CHOOSING
-    for item in lost_items[:5]:
+    for item in lost_items:
         caption = f"🔴 *Потеряно*\n\n*Описание:* {item['description']}\n*Контакт:* @{item['username']}"
         if item["photo_file_id"]:
             await update.message.reply_photo(item["photo_file_id"], caption=caption, parse_mode="Markdown")
@@ -210,7 +210,7 @@ async def show_my_posts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not user_posts:
         await update.message.reply_text("❌ У вас пока нет добавленных постов.")
         return CHOOSING
-    for item in user_posts[:10]:
+    for item in user_posts:
         label = "🟢 Найдено" if item["type"] == "found" else "🔴 Потеряно"
         caption = f"{label}\n\n*Описание:* {item['description']}\n*Вы добавили этот пост.*"
         keyboard = InlineKeyboardMarkup([
