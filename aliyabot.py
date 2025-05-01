@@ -9,7 +9,7 @@ from telegram.ext import (
 )
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
-ADMIN_ID = os.environ.get("ADMIN_ID")  # ID администратора, например: '123456789'
+ADMIN_ID = "1218916376"
 
 logging.basicConfig(level=logging.INFO)
 
