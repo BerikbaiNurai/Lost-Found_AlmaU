@@ -98,26 +98,29 @@ async def send_template(update: Update, context: ContextTypes.DEFAULT_TYPE, mode
 
 
 async def choose_action(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = update.message.text
-    if msg == "🟢 Нашёл":
+    msg = update.message.text.strip()
+    print(f"[DEBUG] Получено сообщение: '{msg}'") 
+
+    if "Нашёл" in msg:
         context.user_data["type"] = "found"
         await send_template(update, context, "found")
         await update.message.reply_text("✏️ Введите описание:")
         return TYPING_DESC
-    elif msg == "🔴 Потерял":
+    elif "Потерял" in msg:
         context.user_data["type"] = "lost"
         await send_template(update, context, "lost")
         await update.message.reply_text("✏️ Введите описание:")
         return TYPING_DESC
-    elif msg == "🟢 Найдено":
+    elif "Найдено" in msg:
         return await show_found_items(update, context)
-    elif msg == "🔴 Потеряно":
+    elif "Потеряно" in msg:
         return await show_lost_items(update, context)
-    elif msg == "🗂 Мои посты":
+    elif "Мои посты" in msg:
         return await show_my_posts(update, context)
     else:
         await update.message.reply_text("Выберите действие с клавиатуры.")
         return CHOOSING
+
 
 
 async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
