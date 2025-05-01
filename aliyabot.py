@@ -9,13 +9,13 @@ from telegram.ext import (
 )
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
+ADMIN_ID = os.environ.get("ADMIN_ID")  # ID администратора, например: '123456789'
 
 logging.basicConfig(level=logging.INFO)
 
 CHOOSING, TYPING_DESC, ASK_PHOTO, SENDING_PHOTO = range(4)
 
 DATA_FILE = "/data/data.json"
-
 
 if exists(DATA_FILE):
     with open(DATA_FILE, "r") as f:
@@ -125,6 +125,7 @@ async def get_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("У вас есть фото этой вещи?", reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True))
     return ASK_PHOTO
 
+
 async def ask_for_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     answer = update.message.text
     if answer == "✅ Да":
@@ -152,7 +153,6 @@ async def save_item_without_photo(update: Update, context: ContextTypes.DEFAULT_
     return await start(update, context)
 
 
-
 async def get_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global data
     photo_file_id = update.message.photo[-1].file_id
@@ -167,7 +167,6 @@ async def get_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_data()
     await update.message.reply_text("✅ Объявление с фото добавлено!")
     return await start(update, context)
-
 
 
 async def show_found_items(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -241,6 +240,20 @@ async def delete_post(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 
+# 👥 Команда /users для просмотра всех пользователей
+async def list_users(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if str(update.message.from_user.id) != str(ADMIN_ID):
+        await update.message.reply_text("❌ У вас нет доступа к этому разделу.")
+        return
+
+    if not data["users"]:
+        await update.message.reply_text("Пользователи ещё не запускали бота.")
+        return
+
+    user_list = "\n".join([f"{uid}: @{username}" for uid, username in data["users"].items()])
+    await update.message.reply_text(f"👥 Список пользователей:\n\n{user_list}")
+
+
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
@@ -257,8 +270,10 @@ def main():
 
     app.add_handler(conv_handler)
     app.add_handler(CallbackQueryHandler(delete_post, pattern="delete:"))
+    app.add_handler(CommandHandler("users", list_users))
 
     app.run_polling()
+
 
 if __name__ == "__main__":
     main()
